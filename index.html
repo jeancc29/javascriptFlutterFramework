@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+     <!-- Compiled and minified CSS -->
+     <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
+
+</head>
+<body>
+    
+    <div id="container">
+        <h1 class="text-blue">Hola mundo</h1>
+    </div>
+    <style>
+        .container{
+            border: 10px solid blue;
+            width: 600px;
+            height: 200px;
+            display: flex; 
+            flex-direction: column;
+            flex-wrap: initial;
+            /* flex-flow: row wrap; */
+            justify-content: space-evenly; /*main axis*/
+            align-items: flex-end; /*cross axis */
+            align-content: space-between;
+        }
+        .item{
+            width: 50px;
+            order: 2;
+            /* height: 50px; */
+        }
+    </style>
+
+    <div class="container">
+        <div class="item" style="background: red; "><p>1</p></div>
+        <div class="item" style="background: green; "><p>2</p></div>
+        <!-- <div class="item" style="background: red; flex-grow: 2;"><p>3</p></div>
+        <div class="item" style="background: yellow"><p>4</p></div>
+        <div class="item" style="background: grey"><p>5</p></div> -->
+    </div>
+
+    <!-- Compiled and minified JavaScript -->
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script> -->
+    <script src="./js/border.js"></script>
+    <!-- <script src="./js/index.js"></script> -->
+    <script src="./js/index2.js"></script>
+    <script>
+        // Text("Hola soy un texto", {"fontSize" : "50px", "color" : "blue"}, "container");
+        // Text("Hola soy un texto", {"fontSize" : "70px", "color" : "red"}, "container");
+        // var p = Container(
+        //     Container(
+        //         Container(
+        //             Text(
+        //                 "Jean",
+        //                 {"fontSize" : "20px", "color" : "blue"}
+        //             ),//Text
+        //             {"background" : "grey"}
+        //         ),//Container
+        //     ), //Container
+        // "container"
+        // );//Container
+
+        // var p = Init(
+        //     "container",
+        //     Container(
+        //         Container(
+        //             Text(
+        //                 "Jean",
+        //                 {"fontSize" : "20px", "color" : "blue"}
+        //             ),//Text
+        //             {"background" : "grey"}
+        //         ),
+        //         {"border" : Border("2px", BorderStyles.solid, "red")}
+        //     ),
+        // );
+
+        function recursivo2(valor, isInit = false){
+            if((valor.child == null || valor.child == undefined ) && Array.isArray(valor) == false)
+                return 0;
+
+            if(Array.isArray(valor.child)){
+                // valor.element.appendChild()
+                recursivoArray(valor);
+            }else{
+                valor.element.appendChild(valor.child.element);
+                recursivo2(valor.child);
+            }
+            
+        }
+
+        function recursivoArray(valor){
+            console.log("recursiveArray valor: ", valor);
+            
+            if(!Array.isArray(valor.child))
+                return;
+            
+            if(valor.child.length <= 0)
+                return;
+
+            var hijo = valor.child.shift();
+            console.log("recursivoArray: ", hijo);
+            if(hijo.element == null){
+                console.log("recursivoArray hijo.element == null: ", hijo);
+                
+                return;
+            }
+            // console.log("recursivoArray hijo.element == null: ", hijo);
+            valor.element.appendChild(hijo.element);
+            if(hijo.child != null)
+                recursivo2(hijo);
+
+            recursivoArray(valor);
+        }
+
+        
+            //  var p =   Init(
+            //         "container",
+            //         Container(
+            //             Row(
+            //             [
+            //                 Text(
+            //                     "Jean",
+            //                     {"fontSize" : "20px", "color" : "blue"}
+            //                 ),
+            //                 Text(
+            //                     "Carlos",
+            //                     {"fontSize" : "25px", "color" : "red"}
+            //                 ),
+            //                 Text(
+            //                     "Manuel",
+            //                     {"fontSize" : "35px", "color" : "red"}
+            //                 ),
+            //                 Container(
+            //                     Row([
+            //                     Text("Culo")
+            //                     ]),
+            //                 ),
+            //             ],//Text
+            //             // {"background" : "grey"}
+            //         ),
+            //         ),
+            //     );
+
+        // p = Init("container", Container(Container(Text("El ripio", {"fontSize" : "23px", "color" : "red"}), {"background" : "blue", "width" : "200px", "height" : "50px"}), {"background" : "yellow", "width" : "250px", "height" : "100px"}));
+        // p = Init(
+        //     "container",
+        //     Column(
+        //         [
+        //             Row(
+        //                 [
+        //                 Text("Hola mi gente"),
+        //                 Text("Hola mi fmailia"),
+        //                 Text("Hola mi fmailia"),
+        //                 Text("Hola mi culo"),
+        //                 ],
+        //                 {'justify-content': "space-between", "flex-wrap" : "wrap"}
+        //             ),//Row
+        //             Container(
+        //                 Text("Hola", {"fontSize" : "13px"}),
+        //                 {"width" : "4vw", "borderRadius" : "1px", "background" : "blue", "textAlign" : "center"}
+        //             )
+        //         ]
+        //     ),//Column
+        // );//INit
+        // console.log("resultado: ", p);
+        // recursivo2(p);
+        // recursivo(p, true);
+        
+        // console.log("resultado length: ", Object.keys(p).length);
+        // recorrerArreglosRecursivamente(p, true);
+
+        var jsonFIle = {
+                "elemento" : {"elemento" : "json"},
+                "children" : [
+                    {
+                        "elemento" : "objeto",
+                        "children" : {
+                            "elemento" : "objeto1.1.1"
+                        }
+                    },
+                    {
+                        "elemento" : "objeto1.2",
+                        "children" : {
+                            "elemento" : "objeto1.2.1"
+                        }
+                    }
+                ]
+            };
+
+            // function recorrerArbol(json)		{
+            //     // json.elemento;
+
+            //    if(Object.keys(json).length == 0)
+            //         return 0;
+                
+            //     if(typeof json.elemento == "object"){
+
+            //     }
+            //     console.log("recorrerArbol elemento: ", json.elemento, ":", Array.isArray(json.children));
+            //     console.log("recorrerArbol children a: ", json.children, ":", Object.values(json.children).length);
+            //     // return resultado;
+            
+            // }
+
+        
+            // recorrerArbol(jsonFIle);
+        
+    </script>
+
+</body>
+</html>
