@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
      <!-- Compiled and minified CSS -->
      <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"> -->
-
+    
 </head>
 <body>
     
@@ -14,29 +15,29 @@
         <h1 class="text-blue">Hola mundo</h1>
     </div>
     <style>
-        .container{
+        /* .container{
             border: 10px solid blue;
             width: 600px;
             height: 200px;
             display: flex; 
             flex-direction: column;
             flex-wrap: initial;
-            /* flex-flow: row wrap; */
-            justify-content: space-evenly; /*main axis*/
-            align-items: flex-end; /*cross axis */
+            flex-flow: row wrap;
+            justify-content: space-evenly; main axis
+            align-items: flex-end; cross axis
             align-content: space-between;
         }
         .item{
             width: 50px;
             order: 2;
-            /* height: 50px; */
-        }
+            height: 50px;
+        } */
     </style>
 
     <div class="container">
-        <div class="item" style="background: red; "><p>1</p></div>
+        <!-- <div class="item" style="background: red; "><p>1</p></div>
         <div class="item" style="background: green; "><p>2</p></div>
-        <!-- <div class="item" style="background: red; flex-grow: 2;"><p>3</p></div>
+        <div class="item" style="background: red; flex-grow: 2;"><p>3</p></div>
         <div class="item" style="background: yellow"><p>4</p></div>
         <div class="item" style="background: grey"><p>5</p></div> -->
     </div>
@@ -47,6 +48,9 @@
     <!-- <script src="./js/index.js"></script> -->
     <script src="./js/index2.js"></script>
     <script>
+        var defaultStyle = document.getElementById("defaultStyle");
+        console.log("defaultStyle: ", defaultStyle);
+        
         // Text("Hola soy un texto", {"fontSize" : "50px", "color" : "blue"}, "container");
         // Text("Hola soy un texto", {"fontSize" : "70px", "color" : "red"}, "container");
         // var p = Container(
