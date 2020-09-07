@@ -13,16 +13,16 @@ let widthUnit : string = "vw";
 
 // }
 
-function InitDefaultStyle(){
-    var buttonHover = 'div.buttonHover:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); }';
-    var defaultStyle = document.getElementById("defaultStyle");
-    if(defaultStyle == null || defaultStyle == undefined){
-        var style = document.createElement('style');
-        style.setAttribute("id", "defaultStyle");
-        style.appendChild(document.createTextNode(buttonHover));
-        document.getElementsByTagName('head')[0].appendChild(style);
+function ramdomString(length : number) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+       result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-}
+    return result;
+ }
+
 
 class TextEditingController{
     public input : any;
@@ -87,6 +87,16 @@ class FormGlobalKey{
 
 
 /********************* STYLES  ************************************/
+function InitDefaultStyle(){
+    var buttonHover = 'div.buttonHover:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); }';
+    var defaultStyle = document.getElementById("defaultStyle");
+    if(defaultStyle == null || defaultStyle == undefined){
+        var style = document.createElement('style');
+        style.setAttribute("id", "defaultStyle");
+        style.appendChild(document.createTextNode(buttonHover));
+        document.getElementsByTagName('head')[0].appendChild(style);
+    }
+}
 
 class FontWeight {
     values : string[] = ["100", "200", "300", "400", "500", "600", "700", "800", "900", "bolder", "lighter", "normal", "bold"];
@@ -385,9 +395,15 @@ function Init({id, child, style, initDefaultStyle = false} : namedParametersInit
 
 function Texto(text : string, style : TextStyle, id = null){
     var element = document.createElement("p");
+    element.setAttribute("id", ramdomString(5));
     element.innerHTML = text;
     element.style.padding = "0px";
     element.style.margin = "0px";
+    
+    element.classList.add("cambios");
+    element.addEventListener("cambios", (function(){
+        console.log("Cambios en el dom text: ", text);
+    }).bind(text))
 
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
@@ -412,7 +428,7 @@ interface namedParametersContainer {
 
 function Container({child, style, id}: namedParametersContainer){
     var element = document.createElement("div");
-    
+    element.setAttribute("id", ramdomString(5));
     
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
@@ -439,6 +455,7 @@ interface namedParametersRow {
 
 function Row({children, mainAxisAlignment, crossAxisAlignment} : namedParametersRow){
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     element.style.display = "flex";
@@ -453,6 +470,7 @@ function Row({children, mainAxisAlignment, crossAxisAlignment} : namedParameters
 
 function Column({children, mainAxisAlignment, crossAxisAlignment} : namedParametersRow){
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     element.style.display = "flex";
@@ -472,6 +490,7 @@ interface namedParametersFlexible {
 
 function Flexible({child, flex} : namedParametersFlexible){
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     
@@ -487,6 +506,7 @@ interface namedParametersExpanded {
 
 function Expanded({child} : namedParametersExpanded){
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     element.style.flexGrow = `20`;
 
@@ -500,6 +520,7 @@ interface namedParametersTextFormField {
 
 function TextFormField({controller, validator} : namedParametersTextFormField){
     var element = controller.input;
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
 
@@ -507,7 +528,7 @@ function TextFormField({controller, validator} : namedParametersTextFormField){
     // y retorna un String en caso contrario con un mensaje  indicando el error de validacion
     if(validator != null && validator != undefined){
         //Creamos el evento personalizado (custom event)
-        var event = new Event('build');
+        // var event = new Event('build');
         // Escucha para el evento. Este evento solo se lanzara desde un FormGlobalKey
         element.addEventListener('validate', validate, false);
         // Disparar event.
@@ -530,6 +551,38 @@ function TextFormField({controller, validator} : namedParametersTextFormField){
     return {"element" : element, "child" : null};
 }
 
+interface namedParametersBuilder{
+    id: string;
+    builder: any;
+}
+
+function Builder({id, builder} : namedParametersBuilder){
+    var element = document.getElementById(id);
+    if(element == null){
+        element = document.createElement("div");
+        element.setAttribute("id", "container");
+    }
+
+    element.innerHTML = "";
+    var setState =( function(callback : any){
+        element?.classList.add("setState");
+        // while (element.firstChild) {
+            // element.removeChild(element.firstChild);
+            var c = document.getElementsByClassName("cambios");
+            var event = new Event("cambios");
+            for(var i = 0; i < c.length; i++){
+                console.log("dentro setState hijos: ", c[i]);
+                c[i].dispatchEvent(event);
+            }
+            
+        // }
+        var elements = builder(id, setState);
+        // builderRecursivo(elements, true);
+    }).bind(element);
+    var elements = builder(id, setState);
+    builderRecursivo(elements, true);
+}
+
 interface namedParametersForm {
     key : FormGlobalKey;
     child : any
@@ -537,6 +590,7 @@ interface namedParametersForm {
 
 function Form({key, child} : namedParametersForm){
     var element = key.form;
+    element.setAttribute("id", ramdomString(5));
 
     return {"element" : element, "child" : child};
 }
@@ -547,7 +601,8 @@ interface namedParametersRaisedButton {
 }
 
 function RaisedButton({child, onPressed} : namedParametersRaisedButton){
-    var element = document.createElement("div");
+    // var element = document.createElement("div");
+    // element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
     
@@ -571,6 +626,7 @@ interface namedParametersSizedBox {
 
 function SizedBox({child, width, height} : namedParametersSizedBox){
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     
@@ -688,47 +744,82 @@ let _formKey = new FormGlobalKey();
 //     }),
 // );
 
+interface namedParametersBuild{
+    id: string;
+}
+declare var flutter : object;
 
-var p = Init(
-    {
-        initDefaultStyle: true,
-        id: "container",
-        style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
-        child: Form({
-            key: _formKey,
-            child: Row({
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                    Container({
-                        child: TextFormField({
-                            controller: new TextEditingController(),
-                            validator: (data : string) => {
-                                if(!data)
-                                    return "error";
-                                
-                                return null;
-                            }
-                        }),
-                    }),
-                    SizedBox({width: 20}),
-                    RaisedButton({
-                        child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
-                        onPressed: () => {
-                            console.log("onpressed: ", _formKey.validate());
-                            
-                            if( _formKey.validate())
-                                console.log("valido");
-                            else
-                                console.log("Invalido errorrr");
-                                
-                                
-                        }
-                    })
-                ]
-            })
-        })}
-);
+// Builder({
+//     id: "container",
+//     builder: (element: any, setState: any) => {
+        
+//         let _mensaje = "Hola soy jean carlos";
 
-builderRecursivo(p, true);
+//         return Init(
+//             {
+//                 initDefaultStyle: true,
+//                 id: "container",
+//                 style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
+//                 child: Form({
+//                     key: _formKey,
+//                     child: Row({
+//                         crossAxisAlignment: CrossAxisAlignment.center,
+//                         children: [
+//                             Container({
+//                                 child: Column({
+//                                     children: [
+//                                         Texto(`${flutter}`, new TextStyle({fontSize: 25})),
+//                                         TextFormField({
+//                                             controller: new TextEditingController(),
+//                                             validator: (data : string) => {
+//                                                 if(!data)
+//                                                     return "error";
+                                                
+//                                                 return null;
+//                                             }
+//                                         })
+//                                     ]
+//                                 }),
+//                             }),
+//                             SizedBox({width: 20}),
+//                             RaisedButton({
+//                                 child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
+//                                 onPressed: () => {
+//                                     console.log("onpressed: ", _formKey.validate());
+//                                     setState(() => _mensaje = "Cambie");
+//                                     if( _formKey.validate())
+//                                         console.log("valido");
+//                                     else
+//                                         console.log("Invalido errorrr");
+                                        
+                                        
+//                                 }
+//                             })
+//                         ]
+//                     })
+//                 })}
+//         );
+//     }
+        
+//     }
+// );
 // _formKey.validate();
+let _mensaje: string = "hola";
+Builder({
+    id: "container",
+    builder:(id : string, setState : any) => {
+        
+        return Init({
+            id: id,
+            child: RaisedButton({
+                child: Texto(_mensaje, new TextStyle({})),
+                onPressed: () => {
+                    setState(() => {
+                        _mensaje = "Cambieeee";
+                    })
+                }
+            })
+        });
+    }
+})
 

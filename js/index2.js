@@ -7,15 +7,14 @@ var widthUnit = "vw";
 // function TextEditingController(){
 //     let input = document.createElement("input");
 // }
-function InitDefaultStyle() {
-    var buttonHover = 'div.buttonHover:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); }';
-    var defaultStyle = document.getElementById("defaultStyle");
-    if (defaultStyle == null || defaultStyle == undefined) {
-        var style = document.createElement('style');
-        style.setAttribute("id", "defaultStyle");
-        style.appendChild(document.createTextNode(buttonHover));
-        document.getElementsByTagName('head')[0].appendChild(style);
+function ramdomString(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
+    return result;
 }
 var TextEditingController = /** @class */ (function () {
     function TextEditingController() {
@@ -68,6 +67,16 @@ var FormGlobalKey = /** @class */ (function () {
 }());
 /********************* INTERFACES  ************************************/
 /********************* STYLES  ************************************/
+function InitDefaultStyle() {
+    var buttonHover = 'div.buttonHover:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); }';
+    var defaultStyle = document.getElementById("defaultStyle");
+    if (defaultStyle == null || defaultStyle == undefined) {
+        var style = document.createElement('style');
+        style.setAttribute("id", "defaultStyle");
+        style.appendChild(document.createTextNode(buttonHover));
+        document.getElementsByTagName('head')[0].appendChild(style);
+    }
+}
 var FontWeight = /** @class */ (function () {
     function FontWeight(index) {
         var _this = this;
@@ -272,9 +281,14 @@ function Init(_a) {
 function Texto(text, style, id) {
     if (id === void 0) { id = null; }
     var element = document.createElement("p");
+    element.setAttribute("id", ramdomString(5));
     element.innerHTML = text;
     element.style.padding = "0px";
     element.style.margin = "0px";
+    element.classList.add("cambios");
+    element.addEventListener("cambios", (function () {
+        console.log("Cambios en el dom text: ", text);
+    }).bind(text));
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
     // });
@@ -289,6 +303,7 @@ function Texto(text, style, id) {
 function Container(_a) {
     var child = _a.child, style = _a.style, id = _a.id;
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
     // });
@@ -304,6 +319,7 @@ function Container(_a) {
 function Row(_a) {
     var children = _a.children, mainAxisAlignment = _a.mainAxisAlignment, crossAxisAlignment = _a.crossAxisAlignment;
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     element.style.display = "flex";
     element.style.flexDirection = "row";
@@ -316,6 +332,7 @@ function Row(_a) {
 function Column(_a) {
     var children = _a.children, mainAxisAlignment = _a.mainAxisAlignment, crossAxisAlignment = _a.crossAxisAlignment;
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     element.style.display = "flex";
     element.style.flexDirection = "column";
@@ -328,6 +345,7 @@ function Column(_a) {
 function Flexible(_a) {
     var child = _a.child, flex = _a.flex;
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     if (flex != null && flex != undefined)
         element.style.flexGrow = "" + flex;
@@ -336,6 +354,7 @@ function Flexible(_a) {
 function Expanded(_a) {
     var child = _a.child;
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     element.style.flexGrow = "20";
     return { "element": element, "child": child };
@@ -343,13 +362,14 @@ function Expanded(_a) {
 function TextFormField(_a) {
     var controller = _a.controller, validator = _a.validator;
     var element = controller.input;
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
     //La variable validator es una function que se invoca desde TextFormField y esta retorna null si es valido
     // y retorna un String en caso contrario con un mensaje  indicando el error de validacion
     if (validator != null && validator != undefined) {
         //Creamos el evento personalizado (custom event)
-        var event = new Event('build');
+        // var event = new Event('build');
         // Escucha para el evento. Este evento solo se lanzara desde un FormGlobalKey
         element.addEventListener('validate', validate, false);
         // Disparar event.
@@ -368,16 +388,43 @@ function TextFormField(_a) {
     }
     return { "element": element, "child": null };
 }
+function Builder(_a) {
+    var id = _a.id, builder = _a.builder;
+    var element = document.getElementById(id);
+    if (element == null) {
+        element = document.createElement("div");
+        element.setAttribute("id", "container");
+    }
+    element.innerHTML = "";
+    var setState = (function (callback) {
+        element === null || element === void 0 ? void 0 : element.classList.add("setState");
+        // while (element.firstChild) {
+        // element.removeChild(element.firstChild);
+        var c = document.getElementsByClassName("cambios");
+        var event = new Event("cambios");
+        for (var i = 0; i < c.length; i++) {
+            console.log("dentro setState hijos: ", c[i]);
+            c[i].dispatchEvent(event);
+        }
+        // }
+        var elements = builder(id, setState);
+        // builderRecursivo(elements, true);
+    }).bind(element);
+    var elements = builder(id, setState);
+    builderRecursivo(elements, true);
+}
 function Form(_a) {
     var key = _a.key, child = _a.child;
     var element = key.form;
+    element.setAttribute("id", ramdomString(5));
     return { "element": element, "child": child };
 }
 function RaisedButton(_a) {
-    var child = _a.child, onPressed = _a.onPressed;
-    var element = document.createElement("div");
+    // var element = document.createElement("div");
+    // element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
+    var child = _a.child, onPressed = _a.onPressed;
     var container = Container({ child: child, style: new TextStyle({ background: "#1a73e8", cursor: "pointer", padding: EdgetInsets.only({ left: 20, right: 20, bottom: 7, top: 7 }), borderRadius: BorderRadius.all(4) }) });
     if (onPressed)
         container.element.addEventListener("click", onPressed);
@@ -390,6 +437,7 @@ function RaisedButton(_a) {
 function SizedBox(_a) {
     var child = _a.child, width = _a.width, height = _a.height;
     var element = document.createElement("div");
+    element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     if (width)
         element.style.width = "" + width + fontSizeUnit;
@@ -433,94 +481,69 @@ function builderArrayRecursivo(widget) {
     builderArrayRecursivo(widget);
 }
 var _formKey = new FormGlobalKey();
-// var p = Init(
-//     "container", 
-//     Container(
-//         {
-//             child: Row({
-//             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//             children : [
-//                 Form({
+// Builder({
+//     id: "container",
+//     builder: (element: any, setState: any) => {
+//         let _mensaje = "Hola soy jean carlos";
+//         return Init(
+//             {
+//                 initDefaultStyle: true,
+//                 id: "container",
+//                 style : new TextStyle({fontFamily: "'Roboto', sans-serif"}),
+//                 child: Form({
 //                     key: _formKey,
 //                     child: Row({
+//                         crossAxisAlignment: CrossAxisAlignment.center,
 //                         children: [
-//                             Flexible({
-//                                 flex: 3,
-//                                 child: TextFormField({controller: new TextEditingController(), validator: (data : string) : string => {
-//                                     console.log("Text");
-//                                     return "jean";
-//                                 }})
+//                             Container({
+//                                 child: Column({
+//                                     children: [
+//                                         Texto(`${flutter}`, new TextStyle({fontSize: 25})),
+//                                         TextFormField({
+//                                             controller: new TextEditingController(),
+//                                             validator: (data : string) => {
+//                                                 if(!data)
+//                                                     return "error";
+//                                                 return null;
+//                                             }
+//                                         })
+//                                     ]
+//                                 }),
 //                             }),
-//                             RaisedButton({child: Texto("Jean", new TextStyle({})), onPressed: () =>{
-//                                 var v = _formKey.validate();
-//                                 console.log("RaisedButton validate: ", v);
-//                             }})
+//                             SizedBox({width: 20}),
+//                             RaisedButton({
+//                                 child: Texto("Crear app", new TextStyle({fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500})),
+//                                 onPressed: () => {
+//                                     console.log("onpressed: ", _formKey.validate());
+//                                     setState(() => _mensaje = "Cambie");
+//                                     if( _formKey.validate())
+//                                         console.log("valido");
+//                                     else
+//                                         console.log("Invalido errorrr");
+//                                 }
+//                             })
 //                         ]
 //                     })
-//                 }),//Flexible
-//                 Flexible({
-//                     flex: 1,
-//                     child: Row(
-//                     {
-//                         children : [
-//                              Texto("jean", new TextStyle({fontSize: 15})),
-//                              Texto("Contreras", new TextStyle({fontSize: 15})),
-//                         ],
-//                         mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                     }
-//                  )}
-//                  ),
-//                 Flexible({
-//                     flex: 3,
-//                     child: Row(
-//                         {
-//                             children : [
-//                                  Texto("jean", new TextStyle({fontSize: 15})),
-//                                  Texto("Contreras", new TextStyle({fontSize: 15})),
-//                             ],
-//                             mainAxisAlignment: MainAxisAlignment.spaceAround,
-//                         }
-//                      )
-//                 }),
-//             ]
-//         })
-//         ,
-//         style: new TextStyle({background : "brown", borderRadius : BorderRadius.all(3), width: 500})
-//     }),
+//                 })}
+//         );
+//     }
+//     }
 // );
-var p = Init({
-    initDefaultStyle: true,
-    id: "container",
-    style: new TextStyle({ fontFamily: "'Roboto', sans-serif" }),
-    child: Form({
-        key: _formKey,
-        child: Row({
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-                Container({
-                    child: TextFormField({
-                        controller: new TextEditingController(),
-                        validator: function (data) {
-                            if (!data)
-                                return "error";
-                            return null;
-                        }
-                    }),
-                }),
-                SizedBox({ width: 20 }),
-                RaisedButton({
-                    child: Texto("Crear app", new TextStyle({ fontSize: 15, color: "#fafcfe", fontWeight: FontWeight.w500 })),
-                    onPressed: function () {
-                        console.log("onpressed: ", _formKey.validate());
-                        if (_formKey.validate())
-                            console.log("valido");
-                        else
-                            console.log("Invalido errorrr");
-                    }
-                })
-            ]
-        })
-    })
-});
-builderRecursivo(p, true);
 // _formKey.validate();
+var _mensaje = "hola";
+Builder({
+    id: "container",
+    builder: function (id, setState) {
+        return Init({
+            id: id,
+            child: RaisedButton({
+                child: Texto(_mensaje, new TextStyle({})),
+                onPressed: function () {
+                    setState(function () {
+                        _mensaje = "Cambieeee";
+                    });
+                }
+            })
+        });
+    }
+});

@@ -64,6 +64,9 @@ label {
   </form>
 
   <button class="button"> button style </button>
+  <button id="crear" class="button"> Crear div rojo </button>
+  <button id="azul" class="button"> Cambiar div a azul </button>
+  <div id="containerPrueba" style="padding: 50px 0px 0px 50px;"></div>
 
 <!-- <div id="floatContainer1" class="float-container">
     <label for="floatField1">Float Label 1</label>
@@ -79,6 +82,29 @@ label {
         floatField.addEventListener('blur', () => {
             floatContainer.classList.remove('active');
         });
+
+         document.getElementById("crear").addEventListener("click", function(){
+            var div = document.createElement("div");
+            div.setAttribute("id", "culo");
+            console.log("dentro crear");
+            
+            div.style.background = "red";
+            div.style.width = "50px";
+            div.style.height = "50px";
+            document.getElementById("containerPrueba").appendChild(div);
+        });
+         document.getElementById("azul").addEventListener("click", function(){
+            var divTmp = document.createElement("div");
+            
+            divTmp.style.background = "blue";
+            divTmp.style.width = "50px";
+            divTmp.style.height = "50px";
+
+            var div = document.getElementById("culo");
+            div.style = divTmp.style;
+            // document.getElementById("containerPrueba").appendChild(div);
+        });
+
 
         const btnEnviar = document.getElementById("enviar");
         // btnEnviar.addEventListener("click", () =>{
