@@ -505,20 +505,24 @@ interface namedParametersContainer {
 
 function Container({child, style, id}: namedParametersContainer){
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    if(id == null || id == undefined)
+        element.setAttribute("id", 'Container-' + ramdomString(5));
+    else
+        element.setAttribute("id", id + ramdomString(5));
     
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
     // });
+    var styleJson = {};
     if(style != null && style != undefined){
         console.log("Container style: ", style);
-        var styleJson = style.toJson();
+        styleJson = style.toJson();
         Object.keys(styleJson).forEach(key => {
             element.style[key] = styleJson[key];
         });
     }
     
-    return {"element" : element, "child" : child};
+    return {"element" : element, "style" : styleJson,  "child" : child};
 }
 
 // class Container{
@@ -719,7 +723,7 @@ function RaisedButton({child, onPressed} : namedParametersRaisedButton){
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
     
-    var container = Container({child: child, style: new TextStyle({background: "#1a73e8", cursor: "pointer",padding: EdgetInsets.only({left: 20, right: 20, bottom: 7, top: 7}), borderRadius: BorderRadius.all(4)})});
+    var container = Container({id: "RaisedButton", child: child, style: new TextStyle({background: "#1a73e8", cursor: "pointer",padding: EdgetInsets.only({left: 20, right: 20, bottom: 7, top: 7}), borderRadius: BorderRadius.all(4)})});
     if(onPressed)
         container.element.addEventListener("click", onPressed);
 
@@ -739,7 +743,7 @@ interface namedParametersSizedBox {
 
 function SizedBox({child, width, height} : namedParametersSizedBox){
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", 'SizedBox-' + ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     
     
