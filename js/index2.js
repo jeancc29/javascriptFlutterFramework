@@ -278,10 +278,37 @@ function Init(_a) {
     }
     return { "element": element, "child": child };
 }
+// class Init{
+//     id: string;
+//     child: any;
+//     style?: TextStyle;
+//     initDefaultStyle?: boolean; 
+//     readonly runType = "Init"; 
+//     constructor({id, child, style, initDefaultStyle = false} : namedParametersInit){
+//         this.id = id;
+//         this.child = child;
+//         this.style = style;
+//         this.initDefaultStyle = initDefaultStyle;
+//     }
+//     toJson(){
+//         var element : any = document.getElementById(this.id);
+//         if(this.style != null && this.style != undefined){
+//             console.log("Container style: ", this.style);
+//             var styleJson = this.style.toJson();
+//             Object.keys(styleJson).forEach(key => {
+//                 element.style[key] = styleJson[key];
+//             });
+//         }
+//         if(this.initDefaultStyle){
+//             InitDefaultStyle();
+//         }
+//         return {"element" : element, "child" : this.child};
+//     }
+// }
 function Texto(text, style, id) {
     if (id === void 0) { id = null; }
     var element = document.createElement("p");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", 'texto-' + ramdomString(5));
     element.innerHTML = text;
     element.style.padding = "0px";
     element.style.margin = "0px";
@@ -298,7 +325,7 @@ function Texto(text, style, id) {
         element.style[key] = styleJson[key];
         console.log("TExt style foreach: ", styleJson[key]);
     });
-    return { "element": element, "child": null };
+    return { "element": element, "style": styleJson, "child": null };
 }
 function Container(_a) {
     var child = _a.child, style = _a.style, id = _a.id;
@@ -396,19 +423,21 @@ function Builder(_a) {
         element.setAttribute("id", "container");
     }
     element.innerHTML = "";
-    var setState = (function (callback) {
+    var setState = (function () {
+        // callback;
+        // console.log("setState: ", callback);
         element === null || element === void 0 ? void 0 : element.classList.add("setState");
         // while (element.firstChild) {
         // element.removeChild(element.firstChild);
-        var c = document.getElementsByClassName("cambios");
-        var event = new Event("cambios");
-        for (var i = 0; i < c.length; i++) {
-            console.log("dentro setState hijos: ", c[i]);
-            c[i].dispatchEvent(event);
-        }
+        // var c = document.getElementsByClassName("cambios");
+        // var event = new Event("cambios");
+        // for(var i = 0; i < c.length; i++){
+        //     console.log("dentro setState hijos: ", c[i]);
+        //     c[i].dispatchEvent(event);
         // }
-        var elements = builder(id, setState);
-        // builderRecursivo(elements, true);
+        // }
+        var elements = builder(element === null || element === void 0 ? void 0 : element.id, setState);
+        builderRecursivo(elements, true);
     }).bind(element);
     var elements = builder(id, setState);
     builderRecursivo(elements, true);
@@ -445,17 +474,67 @@ function SizedBox(_a) {
         element.style.height = "" + height + fontSizeUnit;
     return { "element": element, "child": child };
 }
-function builderRecursivo(widget, isInit) {
+function builderRecursivo(widget, isInit, widgetsYaCreados) {
+    var _a;
     if (isInit === void 0) { isInit = false; }
+    if (widgetsYaCreados === void 0) { widgetsYaCreados = null; }
     if ((widget.child == null || widget.child == undefined) && Array.isArray(widget) == false)
         return 0;
-    if (Array.isArray(widget.child)) {
-        // widget.element.appendChild()
-        builderArrayRecursivo(widget);
+    var hijosDelElementoInit;
+    if (isInit)
+        hijosDelElementoInit = (_a = document.getElementById(widget.element.id)) === null || _a === void 0 ? void 0 : _a.childNodes;
+    if (hijosDelElementoInit != null)
+        if (hijosDelElementoInit.length > 0)
+            widgetsYaCreados = hijosDelElementoInit;
+    if (widgetsYaCreados == null || widgetsYaCreados == undefined) {
+        if (Array.isArray(widget.child)) {
+            // widget.element.appendChild()
+            builderArrayRecursivo(widget);
+        }
+        else {
+            widget.element.appendChild(widget.child.element);
+            builderRecursivo(widget.child);
+        }
     }
     else {
-        widget.element.appendChild(widget.child.element);
-        builderRecursivo(widget.child);
+        if (Array.isArray(widget.child)) {
+            // widget.element.appendChild()
+            builderArrayRecursivo(widget);
+        }
+        else {
+            // widgetsYaCreados.shift();
+            // console.log("builderRecursivo widgetsYaCreados: ", widgetsYaCreados);
+            // console.log("builderRecursivo widgets a crear: ", widget);
+            console.log("Dentrooooooooooooooooooooooooooooooooooo: ", widgetsYaCreados);
+            console.log("Dentroooooooooooooooooooooooooo a crearrr: ", widget.child.element);
+            if (widgetsYaCreados.length == 1) {
+                console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiii");
+                var widgetCreado = widgetsYaCreados[0];
+                if (widget.child.element.nodeName == widgetCreado.nodeName && widget.child.element.nodeType == widgetCreado.nodeType) {
+                    widgetCreado.style.color = widget.child.element.style.color;
+                    widgetCreado.style.background = widget.child.element.style.background;
+                    widgetCreado.style.padding = widget.child.element.style.padding;
+                    widgetCreado.style.color = widget.child.element.style.color;
+                    widgetCreado.style.borderRadius = widget.child.element.style.borderRadius;
+                    if (widget.child.element.nodeName == "P")
+                        widgetCreado.innerHTML = widget.child.element.innerHTML;
+                    console.log("dentro de : ", widget.child.element.nodeName);
+                    builderRecursivo(widget.child, false, widgetCreado.childNodes);
+                    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                }
+                else {
+                    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    return;
+                    widgetsYaCreados.removeChild(widgetCreado);
+                }
+            }
+            else {
+                console.log("Dentrooooooooooooooooooooooooooooooooooo");
+                return;
+                widget.element.appendChild(widget.child.element);
+                builderRecursivo(widget.child);
+            }
+        }
     }
 }
 function builderArrayRecursivo(widget) {
@@ -531,19 +610,41 @@ var _formKey = new FormGlobalKey();
 // );
 // _formKey.validate();
 var _mensaje = "hola";
+var _mostrarColumna = false;
 Builder({
     id: "container",
     builder: function (id, setState) {
         return Init({
             id: id,
-            child: RaisedButton({
-                child: Texto(_mensaje, new TextStyle({})),
-                onPressed: function () {
-                    setState(function () {
-                        _mensaje = "Cambieeee";
-                    });
-                }
-            })
+            child: (_mostrarColumna)
+                ?
+                    Column({
+                        children: [
+                            Texto("Fila1", new TextStyle({})),
+                            Texto("Fila2", new TextStyle({ fontSize: 20 })),
+                        ]
+                    })
+                :
+                    RaisedButton({
+                        child: Texto(_mensaje, new TextStyle({})),
+                        onPressed: function () {
+                            // console.log("onpressed mensaje: ", _mensaje);
+                            _mensaje = "Cambieeee";
+                            _mostrarColumna = true;
+                            setState();
+                            // console.log("onpressed mensaje: ", _mensaje);
+                        }
+                    })
         });
     }
 });
+// var c = new Init({
+//     id: "container", 
+//     child: new Container({
+//         child: new Texto({text: "jean"})
+//     })
+// });
+// for(var cc in c){
+//     console.log("print widget ccccc: ", cc);
+// }
+// console.log("print widget c: ", c.child);

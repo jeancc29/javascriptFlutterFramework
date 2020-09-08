@@ -393,9 +393,40 @@ function Init({id, child, style, initDefaultStyle = false} : namedParametersInit
     return {"element" : element, "child" : child};
 }
 
+// class Init{
+//     id: string;
+//     child: any;
+//     style?: TextStyle;
+//     initDefaultStyle?: boolean; 
+//     readonly runType = "Init"; 
+//     constructor({id, child, style, initDefaultStyle = false} : namedParametersInit){
+//         this.id = id;
+//         this.child = child;
+//         this.style = style;
+//         this.initDefaultStyle = initDefaultStyle;
+//     }
+
+//     toJson(){
+//         var element : any = document.getElementById(this.id);
+//         if(this.style != null && this.style != undefined){
+//             console.log("Container style: ", this.style);
+//             var styleJson = this.style.toJson();
+//             Object.keys(styleJson).forEach(key => {
+//                 element.style[key] = styleJson[key];
+//             });
+//         }
+    
+//         if(this.initDefaultStyle){
+//             InitDefaultStyle();
+//         }
+    
+//         return {"element" : element, "child" : this.child};
+//     }
+// }
+
 function Texto(text : string, style : TextStyle, id = null){
     var element = document.createElement("p");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", 'texto-' +  ramdomString(5));
     element.innerHTML = text;
     element.style.padding = "0px";
     element.style.margin = "0px";
@@ -416,8 +447,54 @@ function Texto(text : string, style : TextStyle, id = null){
         console.log("TExt style foreach: ", styleJson[key]);
     });
     
-    return {"element" : element, "child" : null};
+    return {"element" : element, "style" : styleJson, "child" : null};
 }
+
+interface namedParametersTexto{
+    text: string;
+    style?: TextStyle;
+    id?: string;
+}
+
+// class Texto{
+//     text: string;
+//     style?: TextStyle;
+//     id?: string;
+//     readonly runType = "Texto"; 
+//     constructor({text, style, id}: namedParametersTexto){
+//         this.text = text;
+//         this.style = style;
+//         this.id = id;
+//     }
+
+//     toJson(){
+//         var element = document.createElement("p");
+//         element.setAttribute("id", ramdomString(5));
+//         element.innerHTML = this.text;
+//         element.style.padding = "0px";
+//         element.style.margin = "0px";
+        
+//         element.classList.add("cambios");
+//         element.addEventListener("cambios", (function(){
+//             // console.log("Cambios en el dom text: ", this.text);
+//         }).bind(this.text))
+    
+//         // Object.keys(style.toJson()).forEach(key => {
+//         //     element.style[key] = style[key];
+//         // });
+        
+//         if(this.style != null && this.style != undefined){
+//             var styleJson = this.style.toJson();
+//             console.log("TExt style json: ", styleJson);
+//             Object.keys(styleJson).forEach(key => {
+//                 element.style[key] = styleJson[key];
+//                 console.log("TExt style foreach: ", styleJson[key]);
+//             });
+//         }
+        
+//         return {"element" : element, "child" : null};
+//     }
+// }
 
 interface namedParametersContainer {
     child : any;
@@ -444,6 +521,37 @@ function Container({child, style, id}: namedParametersContainer){
     return {"element" : element, "child" : child};
 }
 
+// class Container{
+//     child : any;
+//     style? : TextStyle;
+//     id? : string;
+//     readonly runType = "Container"; 
+//     constructor({child, style, id}: namedParametersContainer){
+//         this.child = child;
+//         this.style = style;
+//         this.id = id;
+//     }
+
+    
+
+//     toJson(){
+//         var element = document.createElement("div");
+//         element.setAttribute("id", ramdomString(5));
+        
+//         // Object.keys(style.toJson()).forEach(key => {
+//         //     element.style[key] = style[key];
+//         // });
+//         if(this.style != null && this.style != undefined){
+//             console.log("Container style: ", this.style);
+//             var styleJson = this.style.toJson();
+//             Object.keys(styleJson).forEach(key => {
+//                 element.style[key] = styleJson[key];
+//             });
+//         }
+        
+//         return {"element" : element, "child" : this.child};
+//     }
+// }
 
 
 interface namedParametersRow {
@@ -564,20 +672,25 @@ function Builder({id, builder} : namedParametersBuilder){
     }
 
     element.innerHTML = "";
-    var setState =( function(callback : any){
+    interface Prueba {
+        (mensaje : string) : void
+    }
+    var setState =( function(){
+        // callback;
+        // console.log("setState: ", callback);
         element?.classList.add("setState");
         // while (element.firstChild) {
             // element.removeChild(element.firstChild);
-            var c = document.getElementsByClassName("cambios");
-            var event = new Event("cambios");
-            for(var i = 0; i < c.length; i++){
-                console.log("dentro setState hijos: ", c[i]);
-                c[i].dispatchEvent(event);
-            }
+            // var c = document.getElementsByClassName("cambios");
+            // var event = new Event("cambios");
+            // for(var i = 0; i < c.length; i++){
+            //     console.log("dentro setState hijos: ", c[i]);
+            //     c[i].dispatchEvent(event);
+            // }
             
         // }
-        var elements = builder(id, setState);
-        // builderRecursivo(elements, true);
+        var elements = builder(element?.id, setState);
+        builderRecursivo(elements, true);
     }).bind(element);
     var elements = builder(id, setState);
     builderRecursivo(elements, true);
@@ -638,17 +751,68 @@ function SizedBox({child, width, height} : namedParametersSizedBox){
     return {"element" : element, "child" : child};
 }
 
-function builderRecursivo(widget : any, isInit = false){
+function builderRecursivo(widget : any, isInit = false, widgetsYaCreados : any = null){
     if((widget.child == null || widget.child == undefined ) && Array.isArray(widget) == false)
         return 0;
+    var hijosDelElementoInit;
+    if(isInit)
+        hijosDelElementoInit = document.getElementById(widget.element.id)?.childNodes;
+    
+    if(hijosDelElementoInit != null)
+        if(hijosDelElementoInit.length > 0)
+            widgetsYaCreados = hijosDelElementoInit;
 
-    if(Array.isArray(widget.child)){
-        // widget.element.appendChild()
-        builderArrayRecursivo(widget);
+    
+
+    if(widgetsYaCreados == null || widgetsYaCreados == undefined){
+        if(Array.isArray(widget.child)){
+            // widget.element.appendChild()
+            builderArrayRecursivo(widget);
+        }else{
+            widget.element.appendChild(widget.child.element);
+            builderRecursivo(widget.child);
+        }
     }else{
-        widget.element.appendChild(widget.child.element);
-        builderRecursivo(widget.child);
+        if(Array.isArray(widget.child)){
+            // widget.element.appendChild()
+            builderArrayRecursivo(widget);
+        }else{
+            // widgetsYaCreados.shift();
+            // console.log("builderRecursivo widgetsYaCreados: ", widgetsYaCreados);
+            // console.log("builderRecursivo widgets a crear: ", widget);
+            console.log("Dentrooooooooooooooooooooooooooooooooooo: ", widgetsYaCreados);
+            console.log("Dentroooooooooooooooooooooooooo a crearrr: ", widget.child.element);
+            
+            if(widgetsYaCreados.length == 1){
+                console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiii");
+                var widgetCreado = widgetsYaCreados[0];
+                if(widget.child.element.nodeName == widgetCreado.nodeName && widget.child.element.nodeType == widgetCreado.nodeType){
+                    widgetCreado.style.color = widget.child.element.style.color;
+                    widgetCreado.style.background = widget.child.element.style.background;
+                    widgetCreado.style.padding = widget.child.element.style.padding;
+                    widgetCreado.style.color = widget.child.element.style.color;
+                    widgetCreado.style.borderRadius = widget.child.element.style.borderRadius;
+                    if(widget.child.element.nodeName == "P")
+                        widgetCreado.innerHTML = widget.child.element.innerHTML;
+                    console.log("dentro de : ", widget.child.element.nodeName);
+                    builderRecursivo(widget.child, false, widgetCreado.childNodes);
+                    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                }else{
+                    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    return;
+                    widgetsYaCreados.removeChild(widgetCreado);
+                }
+            }else{
+                console.log("Dentrooooooooooooooooooooooooooooooooooo");
+                
+                return;
+                widget.element.appendChild(widget.child.element);
+                builderRecursivo(widget.child);
+            }
+            
+        }
     }
+    
     
 }
 
@@ -804,22 +968,53 @@ declare var flutter : object;
 //     }
 // );
 // _formKey.validate();
+
+
+
+
+
 let _mensaje: string = "hola";
+let _mostrarColumna = false;
 Builder({
     id: "container",
     builder:(id : string, setState : any) => {
         
         return Init({
             id: id,
-            child: RaisedButton({
+            child: 
+            (_mostrarColumna)
+            ?
+            Column({
+                children: [
+                    Texto("Fila1", new TextStyle({})),
+                    Texto("Fila2", new TextStyle({fontSize: 20})),
+                ]
+            })
+            :
+            RaisedButton({
                 child: Texto(_mensaje, new TextStyle({})),
                 onPressed: () => {
-                    setState(() => {
-                        _mensaje = "Cambieeee";
-                    })
+                    // console.log("onpressed mensaje: ", _mensaje);
+                    _mensaje = "Cambieeee";
+                    _mostrarColumna = true;
+                    setState();
+                    // console.log("onpressed mensaje: ", _mensaje);
                 }
             })
         });
     }
 })
+
+// var c = new Init({
+//     id: "container", 
+//     child: new Container({
+//         child: new Texto({text: "jean"})
+//     })
+// });
+
+// for(var cc in c){
+//     console.log("print widget ccccc: ", cc);
+// }
+// console.log("print widget c: ", c.child);
+
 
