@@ -227,7 +227,7 @@ var TextStyle = /** @class */ (function () {
                         var valor = "";
                         if (i == "fontSize" || i == "width" || i == "height") {
                             valor += "" + this[i] + fontSizeUnit;
-                            console.log("" + valor);
+                            // console.log(`${valor}`);
                         }
                         else
                             valor = this[i];
@@ -308,7 +308,7 @@ function Init(_a) {
 function Texto(text, style, id) {
     if (id === void 0) { id = null; }
     var element = document.createElement("p");
-    element.setAttribute("id", 'texto-' + ramdomString(5));
+    element.setAttribute("id", 'Texto-' + ramdomString(7));
     element.innerHTML = text;
     element.style.padding = "0px";
     element.style.margin = "0px";
@@ -320,76 +320,93 @@ function Texto(text, style, id) {
     //     element.style[key] = style[key];
     // });
     var styleJson = style.toJson();
-    console.log("TExt style json: ", styleJson);
+    // console.log("TExt style json: ", styleJson);
     Object.keys(styleJson).forEach(function (key) {
         element.style[key] = styleJson[key];
-        console.log("TExt style foreach: ", styleJson[key]);
+        // console.log("TExt style foreach: ", styleJson[key]);
     });
-    return { "element": element, "style": styleJson, "child": null };
+    return { "element": element, "style": styleJson, "type": "Texto", "child": null };
 }
 function Container(_a) {
     var child = _a.child, style = _a.style, id = _a.id;
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    if (id == null || id == undefined)
+        element.setAttribute("id", 'Container-' + ramdomString(7));
+    else
+        element.setAttribute("id", id + "-" + ramdomString(7));
     // Object.keys(style.toJson()).forEach(key => {
     //     element.style[key] = style[key];
     // });
+    var styleJson = {};
     if (style != null && style != undefined) {
         console.log("Container style: ", style);
-        var styleJson = style.toJson();
+        styleJson = style.toJson();
         Object.keys(styleJson).forEach(function (key) {
             element.style[key] = styleJson[key];
         });
     }
-    return { "element": element, "child": child };
+    return { "element": element, "style": styleJson, "type": "Container", "child": child };
 }
 function Row(_a) {
     var children = _a.children, mainAxisAlignment = _a.mainAxisAlignment, crossAxisAlignment = _a.crossAxisAlignment;
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", "Row-" + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    var styleJson = {};
     element.style.display = "flex";
     element.style.flexDirection = "row";
-    if (mainAxisAlignment != null && mainAxisAlignment != undefined)
+    if (mainAxisAlignment != null && mainAxisAlignment != undefined) {
         element.style.justifyContent = mainAxisAlignment.toString();
-    if (crossAxisAlignment != null && crossAxisAlignment != undefined)
+        styleJson.justifyContent = mainAxisAlignment.toString();
+    }
+    if (crossAxisAlignment != null && crossAxisAlignment != undefined) {
         element.style.alignItems = crossAxisAlignment.toString();
-    return { "element": element, "child": children };
+        styleJson.alignItems = crossAxisAlignment.toString();
+    }
+    return { "element": element, "style": styleJson, "type": "Row", "child": children };
 }
 function Column(_a) {
     var children = _a.children, mainAxisAlignment = _a.mainAxisAlignment, crossAxisAlignment = _a.crossAxisAlignment;
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", "Column-" + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    var styleJson = {};
     element.style.display = "flex";
     element.style.flexDirection = "column";
-    if (mainAxisAlignment != null && mainAxisAlignment != undefined)
+    if (mainAxisAlignment != null && mainAxisAlignment != undefined) {
         element.style.justifyContent = mainAxisAlignment.toString();
-    if (crossAxisAlignment != null && crossAxisAlignment != undefined)
+        styleJson.justifyContent = mainAxisAlignment.toString();
+    }
+    if (crossAxisAlignment != null && crossAxisAlignment != undefined) {
         element.style.alignItems = crossAxisAlignment.toString();
-    return { "element": element, "child": children };
+        styleJson.alignItems = crossAxisAlignment.toString();
+    }
+    return { "element": element, "style": styleJson, "type": "Column", "child": children };
 }
 function Flexible(_a) {
     var child = _a.child, flex = _a.flex;
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", "Flexible-" + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
-    if (flex != null && flex != undefined)
+    var styleJson = {};
+    if (flex != null && flex != undefined) {
         element.style.flexGrow = "" + flex;
-    return { "element": element, "child": child };
+        styleJson.flexGrow = "" + flex;
+    }
+    return { "element": element, "style": styleJson, "type": "Flexible", "child": child };
 }
 function Expanded(_a) {
     var child = _a.child;
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", "Expanded-" + ramdomString(7));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     element.style.flexGrow = "20";
-    return { "element": element, "child": child };
+    return { "element": element, "style": {}, "type": "Expanded", "child": child };
 }
 function TextFormField(_a) {
     var controller = _a.controller, validator = _a.validator;
     var element = controller.input;
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", "TextFormField-" + ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // element.style.flexGrow = `20`;
     //La variable validator es una function que se invoca desde TextFormField y esta retorna null si es valido
@@ -413,7 +430,7 @@ function TextFormField(_a) {
             // throw {"mensaje" : "input validator error"};
         }
     }
-    return { "element": element, "child": null };
+    return { "element": element, "style": {}, "type": "TextFormField", "child": null };
 }
 function Builder(_a) {
     var id = _a.id, builder = _a.builder;
@@ -436,7 +453,9 @@ function Builder(_a) {
         //     c[i].dispatchEvent(event);
         // }
         // }
+        console.log("Resultadosssssssss id: ", element === null || element === void 0 ? void 0 : element.id);
         var elements = builder(element === null || element === void 0 ? void 0 : element.id, setState);
+        console.log("Resultadooooooooooooos: ", elements);
         builderRecursivo(elements, true);
     }).bind(element);
     var elements = builder(id, setState);
@@ -453,8 +472,8 @@ function RaisedButton(_a) {
     // element.setAttribute("id", ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
-    var child = _a.child, onPressed = _a.onPressed;
-    var container = Container({ child: child, style: new TextStyle({ background: "#1a73e8", cursor: "pointer", padding: EdgetInsets.only({ left: 20, right: 20, bottom: 7, top: 7 }), borderRadius: BorderRadius.all(4) }) });
+    var child = _a.child, onPressed = _a.onPressed, _b = _a.color, color = _b === void 0 ? "#1a73e8" : _b;
+    var container = Container({ id: "RaisedButton", child: child, style: new TextStyle({ background: color, cursor: "pointer", padding: EdgetInsets.only({ left: 20, right: 20, bottom: 7, top: 7 }), borderRadius: BorderRadius.all(4) }) });
     if (onPressed)
         container.element.addEventListener("click", onPressed);
     container.element.classList.add("buttonHover");
@@ -466,7 +485,7 @@ function RaisedButton(_a) {
 function SizedBox(_a) {
     var child = _a.child, width = _a.width, height = _a.height;
     var element = document.createElement("div");
-    element.setAttribute("id", ramdomString(5));
+    element.setAttribute("id", 'SizedBox-' + ramdomString(5));
     // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
     if (width)
         element.style.width = "" + width + fontSizeUnit;
@@ -499,7 +518,9 @@ function builderRecursivo(widget, isInit, widgetsYaCreados) {
     else {
         if (Array.isArray(widget.child)) {
             // widget.element.appendChild()
-            builderArrayRecursivo(widget);
+            console.log("Dentro array: ", widgetsYaCreados);
+            var array = Array.from(widgetsYaCreados);
+            builderArrayRecursivo(widget, array);
         }
         else {
             // widgetsYaCreados.shift();
@@ -508,56 +529,120 @@ function builderRecursivo(widget, isInit, widgetsYaCreados) {
             console.log("Dentrooooooooooooooooooooooooooooooooooo: ", widgetsYaCreados);
             console.log("Dentroooooooooooooooooooooooooo a crearrr: ", widget.child.element);
             if (widgetsYaCreados.length == 1) {
-                console.log("iiiiiiiiiiiiiiiiiiiiiiiiiiii");
                 var widgetCreado = widgetsYaCreados[0];
-                if (widget.child.element.nodeName == widgetCreado.nodeName && widget.child.element.nodeType == widgetCreado.nodeType) {
-                    widgetCreado.style.color = widget.child.element.style.color;
-                    widgetCreado.style.background = widget.child.element.style.background;
-                    widgetCreado.style.padding = widget.child.element.style.padding;
-                    widgetCreado.style.color = widget.child.element.style.color;
-                    widgetCreado.style.borderRadius = widget.child.element.style.borderRadius;
-                    if (widget.child.element.nodeName == "P")
-                        widgetCreado.innerHTML = widget.child.element.innerHTML;
-                    console.log("dentro de : ", widget.child.element.nodeName);
+                if (widget.child.type == widgetCreado.id.split("-")[0] && widget.child.element.nodeName == widgetCreado.nodeName && widget.child.element.nodeType == widgetCreado.nodeType) {
+                    updateStyleOfExistenteWidget(widget, widgetCreado);
+                    updateTextOfExistenteWidget(widget, widgetCreado);
+                    widget.child.element = widgetCreado;
                     builderRecursivo(widget.child, false, widgetCreado.childNodes);
-                    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
                 }
                 else {
-                    console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                    return;
-                    widgetsYaCreados.removeChild(widgetCreado);
+                    //Tomamos el nodo padre
+                    var parent = widgetCreado.parentNode;
+                    //Creamos el nuevo nodo
+                    widget.element.appendChild(widget.child.element);
+                    //Eliminamos el viejo nodo
+                    parent.removeChild(widgetCreado);
+                    builderRecursivo(widget.child, false, widgetCreado.childNodes);
                 }
             }
             else {
-                console.log("Dentrooooooooooooooooooooooooooooooooooo");
-                return;
+                console.log("Son diferente");
+                // return;
                 widget.element.appendChild(widget.child.element);
                 builderRecursivo(widget.child);
             }
         }
     }
 }
-function builderArrayRecursivo(widget) {
+function builderArrayRecursivo(widget, widgetsYaCreados) {
     // console.log("recursiveArray widget: ", widget);
-    //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
-    if (!Array.isArray(widget.child))
-        return;
-    //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
-    if (widget.child.length <= 0)
-        return;
-    //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
-    var hijo = widget.child.shift();
-    //el atributo element es el elemento html o nodo que pertenece al widget hijo
-    if (hijo.element == null) {
-        return;
+    if (widgetsYaCreados == null || widgetsYaCreados == undefined) {
+        //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
+        if (!Array.isArray(widget.child))
+            return;
+        //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
+        if (widget.child.length <= 0)
+            return;
+        //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
+        var hijo = widget.child.shift();
+        //el atributo element es el elemento html o nodo que pertenece al widget hijo
+        if (hijo.element == null) {
+            return;
+        }
+        //Al widget el anadimos el widget hijo que obtuvimos y eliminamos del arreglo
+        widget.element.appendChild(hijo.element);
+        //Si el widget hijo tiene mas hijos entonces lo recorreremos recursivamente, para eso llamamos a la funcion builderRecursvio
+        if (hijo.child != null)
+            builderRecursivo(hijo);
+        //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
+        builderArrayRecursivo(widget);
     }
-    //Al widget el anadimos el widget hijo que obtuvimos y eliminamos del arreglo
-    widget.element.appendChild(hijo.element);
-    //Si el widget hijo tiene mas hijos entonces lo recorreremos recursivamente, para eso llamamos a la funcion builderRecursvio
-    if (hijo.child != null)
-        builderRecursivo(hijo);
-    //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
-    builderArrayRecursivo(widget);
+    else {
+        //Veriricamos de que el hijo sea un array para recorrerlo recursivamente
+        if (!Array.isArray(widget.child))
+            return;
+        //Si el tamano del arreglo hijo es cero entonces ya no hay que recorrer nada asi que retornamos para salir de la funcion
+        if (widget.child.length <= 0)
+            return;
+        //Eliminamos y optenemos el primer elemento(widget) del arreglo hijo, asi el tamano del arreglo se va reduciendo
+        var hijo = widget.child.shift();
+        var widgetCreado = widgetsYaCreados.shift();
+        //el atributo element es el elemento html o nodo que pertenece al widget hijo
+        if (hijo.element == null) {
+            return;
+        }
+        console.log("builderArrayRecursivo antes de error: ", hijo.element.innerHTML);
+        //Al widget le anadimos el widget hijo que obtuvimos y eliminamos del arreglo
+        if (widgetCreado != null && widgetCreado != null) {
+            if (hijo.type == widgetCreado.id.split("-")[0] && hijo.element.nodeName == widgetCreado.nodeName && hijo.element.nodeType == widgetCreado.nodeType) {
+                updateStyleOfExistenteWidget(hijo, widgetCreado);
+                updateTextOfExistenteWidget(hijo, widgetCreado);
+                // builderRecursivo(widget.child, false, widgetCreado.childNodes);
+            }
+            else {
+                //Tomamos el nodo padre
+                var parent = widgetCreado.parentNode;
+                //Creamos el nuevo nodo
+                widget.element.appendChild(hijo.element);
+                //Eliminamos el viejo nodo
+                parent.removeChild(widgetCreado);
+                // builderRecursivo(widget.child, false, widgetCreado.childNodes);
+            }
+        }
+        else {
+            widget.element.appendChild(hijo.element);
+        }
+        // widget.element.appendChild(hijo.element);
+        // console.log("builderArrayRecursivo: ", hijo);
+        //Si el widget hijo tiene mas hijos entonces lo recorreremos recursivamente, para eso llamamos a la funcion builderRecursvio
+        if (hijo.child != null)
+            builderRecursivo(hijo, false, widgetCreado);
+        // console.log("builderArrayRecursivo despues: ", hijo);
+        //Llamamos a esta misma funcion para seguir recorriendo de manera recursiva
+        builderArrayRecursivo(widget, widgetsYaCreados);
+    }
+}
+function updateStyleOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
+    console.log("updateStyleOfExistenteWidget nuevoWidget: ", nuevoWidget);
+    if (nuevoWidget.child == null || nuevoWidget.child == undefined)
+        return;
+    if (nuevoWidget.child.style == null || nuevoWidget.child.style == undefined)
+        return;
+    Object.keys(nuevoWidget.child.style).forEach(function (key) {
+        widgetViejoOExistente.style[key] = nuevoWidget.child.style[key];
+    });
+}
+function updateTextOfExistenteWidget(nuevoWidget, widgetViejoOExistente) {
+    if (nuevoWidget.child != null && nuevoWidget.child != undefined) {
+        if (nuevoWidget.child.element != null && nuevoWidget.child.element != undefined)
+            if (nuevoWidget.child.element.id.split("-") == "Texto")
+                widgetViejoOExistente.innerHTML = nuevoWidget.child.element.innerHTML;
+    }
+    if (nuevoWidget.element != null && nuevoWidget.element != undefined) {
+        if (nuevoWidget.element.id.split("-")[0] == "Texto")
+            widgetViejoOExistente.innerHTML = nuevoWidget.element.innerHTML;
+    }
 }
 var _formKey = new FormGlobalKey();
 // Builder({
@@ -611,6 +696,7 @@ var _formKey = new FormGlobalKey();
 // _formKey.validate();
 var _mensaje = "hola";
 var _mostrarColumna = false;
+var color = "green";
 Builder({
     id: "container",
     builder: function (id, setState) {
@@ -620,20 +706,66 @@ Builder({
                 ?
                     Column({
                         children: [
-                            Texto("Fila1", new TextStyle({})),
+                            Texto("Fila1 - " + _mensaje, new TextStyle({})),
                             Texto("Fila2", new TextStyle({ fontSize: 20 })),
+                            Texto("Fila3", new TextStyle({ fontSize: 25 })),
+                            Texto("Fila4", new TextStyle({ fontSize: 30 })),
+                            Column({
+                                children: [
+                                    Texto("Fila5", new TextStyle({ fontSize: 35 })),
+                                    Row({
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: [
+                                            Column({
+                                                children: [
+                                                    Row({
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                            Texto("Fila5.1", new TextStyle({ fontSize: 35 })),
+                                                            Column({
+                                                                children: [
+                                                                    Row({
+                                                                        children: [
+                                                                            Texto("Fila5.1.1", new TextStyle({ fontSize: 20 })),
+                                                                            RaisedButton({
+                                                                                color: color,
+                                                                                child: Texto("click", new TextStyle({})),
+                                                                                onPressed: function () {
+                                                                                    color = "red";
+                                                                                    setState();
+                                                                                }
+                                                                            })
+                                                                        ]
+                                                                    }),
+                                                                    Texto("Fila5.1.2", new TextStyle({ fontSize: 20 })),
+                                                                ]
+                                                            })
+                                                        ]
+                                                    })
+                                                ]
+                                            }),
+                                            Texto("Fila5.2", new TextStyle({ fontSize: 35 })),
+                                        ]
+                                    })
+                                ]
+                            })
                         ]
                     })
                 :
-                    RaisedButton({
-                        child: Texto(_mensaje, new TextStyle({})),
-                        onPressed: function () {
-                            // console.log("onpressed mensaje: ", _mensaje);
-                            _mensaje = "Cambieeee";
-                            _mostrarColumna = true;
-                            setState();
-                            // console.log("onpressed mensaje: ", _mensaje);
-                        }
+                    Column({
+                        children: [
+                            Texto("Fila1 - " + _mensaje, new TextStyle({})),
+                            RaisedButton({
+                                child: Texto(_mensaje, new TextStyle({})),
+                                onPressed: function () {
+                                    // console.log("onpressed mensaje: ", _mensaje);
+                                    _mensaje = "Cambieeee";
+                                    _mostrarColumna = true;
+                                    setState();
+                                    // console.log("onpressed mensaje: ", _mensaje);
+                                }
+                            })
+                        ]
                     })
         });
     }
