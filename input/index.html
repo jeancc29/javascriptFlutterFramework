@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
 </head>
 <body>
     <style>
@@ -17,17 +19,18 @@
 .inp {
     width: 100%;
     border:none;
-    border-bottom: 1px solid #1890ff;
+    border-bottom: 0.01px solid #c7c5c5;
     padding: 10px 0px;
     outline: none;
  }
 
 label {
   font-size: 16px;
+  color: #bdb9b9;
   position: absolute;
   transform-origin: top left;
-  transform: translate(0, 16px) scale(1);
-  transition: all .1s ease-in-out;
+  transform: translate(0, 14px) scale(1);
+  transition: all .19s ease-in-out;
 }
 .float-container.active label {
   transform: translate(0, -4px) scale(.70);
@@ -35,38 +38,135 @@ label {
 
 
 
-.button {
-  background-color: #4CAF50; /* Green */
-  border: none;
-  color: white;
-  padding: 15px 32px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
+
+label.float-label {
   font-size: 16px;
+  color: #bdb9b9;
+  position: absolute;
+  transform-origin: top left;
+  transform: translate(0, 14px) scale(1);
+  transition: all .19s ease-in-out;
 }
+
+
+    label.float-label.active {
+        transform: translate(0, -4px) scale(.70);
+    }
+
+
+
+        .button {
+            background-color: #4CAF50; /* Green */
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
     </style>
 
-<div id="floatContainer" class="float-container">
-    <label for="floatField">Float </label>
-    <input class="inp" id="floatField" type="text">
+    <!-- <div style="width: 100px;" id="floatContainer" class="float-container">
+        <label for="floatField">Float </label>
+        <input class="inp" id="floatField" type="text">
+    </div> -->
+
+  <!-- <div style="width: 100px;" id="" class="">
+    <label class="float-label" for="floatField2">Float2 </label>
+    <input class="inp" id="floatField2" type="text">
+  </div> -->
+
+  <style>
+      ::-webkit-scrollbar {
+        width: 6px;
+    }
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f6f6f6; 
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+      .container2{
+            /* border: 10px solid blue; */
+            /* width: 600px; */
+            /* height: 200px; */
+            display: flex; 
+            flex-direction: column;
+            flex-wrap: initial;
+            flex-flow: column wrap;
+            justify-content: space-evenly; /*main axis*/
+            align-items: flex-start; 
+            /*cross axis*/
+            /* align-content: space-between; */
+
+            /* -ms-flex-pack: distribute; */
+            /* -webkit-justify-content: space-around; */
+        }
+        /* .container2 div:hover{
+            background: #f1f1f1;
+        } */
+
+        .dropdowItem:hover{
+            background: #f1f1f1;
+        }
+        .item{
+            width: 50px;
+            order: 2;
+            height: 50px;
+        }
+  </style>
+  <!-- https://www.w3schools.com/w3css/4/w3.css -->
+  <!-- https://developer.mozilla.org/es/docs/Web/API/Element/animate -->
+  <!-- https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Animations/Using_CSS_animations -->
+  <div id="culo" style="border-bottom: 1px solid #c1c1c1; width: 200px; margin: auto;">
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <span >Hola soy un texto</span>
+        <span class="material-icons" >
+        arrow_drop_down
+        </span>
+    </div>
+    <div id="dropdown" style="visibility: hidden; background: white; z-index: 99; position: absolute; top: 20px; box-shadow: 0px 1.5px 5px 4px #f1f1f1; max-height: 340px; overflow-y: scroll; scrollbar-width: 10px;">
+        <div class="container2">
+            <div class="dropdowItem" style="padding: 10px; align-self: stretch;">Santiago</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+            <div style="padding: 10px;">Santo domingooooooooooo</div>
+        </div>
+    </div>
+    <!-- <select name="cars" id="cars" multiple>
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="opel">Opel</option>
+        <option value="audi">Audi</option>
+    </select> -->
   </div>
 
-  <form action="post" id="form1" novalidate>
-      <div>
-          <input type="text" id="input1">
-      </div>
-      <div>
-          <input type="number" id="input2">
-      </div>
+  
+  
 
-      <input id="enviar" type="submit" value="Enviar">
-  </form>
-
-  <button class="button"> button style </button>
-  <button id="crear" class="button"> Crear div rojo </button>
-  <button id="azul" class="button"> Cambiar div a azul </button>
-  <div id="containerPrueba" style="padding: 50px 0px 0px 50px;"></div>
+  <!-- <div style="width: 50px; height: 50px; color: red;"></div> -->
 
 <!-- <div id="floatContainer1" class="float-container">
     <label for="floatField1">Float Label 1</label>
@@ -74,13 +174,81 @@ label {
   </div> -->
 
       <script>
-          const floatField = document.getElementById('floatField');
+          var dropdown = document.getElementById("culo");
+
+          window.addEventListener("click", function(){
+            var culo = document.getElementById("dropdown");
+            if(culo.classList.contains("open")){
+                console.log("dentro windows: ", culo.classList.contains("open"), " ", culo.style.visibility);
+                
+                culo.style.visibility = "hidden";
+            }
+          })
+          
+          dropdown.addEventListener("click", function(event){
+            event.stopPropagation();
+              var culo = document.getElementById("dropdown");
+              if(culo.style.visibility == "visible")
+                return;
+              culo.style.visibility ="visible";
+              culo.classList.add("open");
+              
+            //   var culo = document.getElementById("dropdown");
+                culo.addEventListener("blur", function(){
+                    console.log("saliooo");
+                    
+                })
+
+                document.getElementById("dropdown").animate([
+                        // keyframes
+                        // { transform: 'translateY(0px)' }, 
+                        // { transform: 'translateY(50px)' }
+                        { transform: 'scale(0)' }, 
+                        { transform: 'scale(1)' }
+                    ], 
+                    { 
+                        // timing options
+                        duration: 100,
+                        // iterations: Infinity
+                    });
+            })
+
+          
+
+
+
+        const floatField = document.getElementById('floatField');
         const floatContainer = document.getElementById('floatContainer');
         floatField.addEventListener('focus', () => {
             floatContainer.classList.add('active');
+            floatField.style.borderBottom = "0.19px solid blue";
+            var labelHermano = floatField.previousElementSibling;
+            labelHermano.style.color = "blue";
         });
         floatField.addEventListener('blur', () => {
             floatContainer.classList.remove('active');
+            floatField.style.borderBottom = "0.19px solid #bdb9b9";
+            var labelHermano = floatField.previousElementSibling;
+            labelHermano.style.color = "#bdb9b9";
+        });
+
+
+        const floatField2 = document.getElementById('floatField2');
+        // const floatContainer = document.getElementById('floatContainer');
+        floatField2.addEventListener('focus', () => {
+            
+            
+            var labelHermano = floatField2.previousElementSibling;
+            labelHermano.classList.add('active');
+            labelHermano.style.color = "blue";
+            floatField2.style.borderBottom = "0.19px solid blue";
+        });
+        floatField2.addEventListener('blur', () => {
+            var labelHermano = floatField2.previousElementSibling;
+            labelHermano.style.color = "#bdb9b9";
+            labelHermano.classList.remove('active');
+            floatField2.style.borderBottom = "0.19px solid #bdb9b9";
+            
         });
 
          document.getElementById("crear").addEventListener("click", function(){
@@ -106,7 +274,7 @@ label {
         });
 
 
-        const btnEnviar = document.getElementById("enviar");
+        const btnEnviar = document.getElementById("enviar").style;
         // btnEnviar.addEventListener("click", () =>{
         //     const form1 = document.getElementById("form1");
         //     form1.submit();
