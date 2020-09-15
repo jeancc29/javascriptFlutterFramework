@@ -172,6 +172,7 @@ function InitDefaultStyle(){
       
 
     var buttonHover = 'div.buttonHover:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); }';
+    buttonHover += 'div.buttonFlatHover:hover{ background-color: rgba(0,0,0,0.05); filter:brightness(0.9); }'
     // var flex = '.flex {display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;}'
     // var row = '.row {-webkit-box-direction: normal; -webkit-box-orient: horizontal;-moz-box-direction: normal;-moz-box-orient: horizontal;}'
     var labelFloating = 'label.labelFloating {color: #bdb9b9; position: absolute; transform-origin: top left; transform: translate(0, 14px) scale(1);transition: all .19s ease-in-out;}'
@@ -321,7 +322,7 @@ class TextAlign {
 }
 
 class Icons {
-    values : string[] = ["arrow_drop_down", "right", "center", "justify"];
+    values : string[] = ["arrow_drop_down", "done", "center", "justify"];
     index : number;
     private constructor(index : number){
         this.index = index - 1;
@@ -329,6 +330,7 @@ class Icons {
     
     
     static arrow_drop_down = new Icons(1);
+    static done = new Icons(2);
     
 
     
@@ -875,7 +877,7 @@ interface namedParametersVisibility{
 function Visibility({child, visible} : namedParametersVisibility){
     var element = document.createElement("div");
     element.setAttribute("id", "Visibility-" + ramdomString(7));
-    if(visible)
+    if(visible == false)
         element.style.display = "none";
     
 
@@ -1165,6 +1167,183 @@ function DropdownButton({items, onChanged, value} : namedParametersDropdownButto
     // return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
 }
 
+interface namedParametersDropdownButtonMultiple{
+    items:DropDownMenuItem[];
+    onChanged:any;
+    selectedValues:string[];
+}
+
+
+function DropdownButtonMultiple({items, onChanged, selectedValues = []} : namedParametersDropdownButtonMultiple){
+    let values:string = (selectedValues.length > 0) ? selectedValues.toString() : "Seleccionar";
+    let valuesToReturn:string[] = (selectedValues != null && selectedValues != undefined) ? selectedValues : [];
+    
+    //fila para mostrar texto e icono principal
+    var texto = Texto(values, new TextStyle({}));
+    var icon = Icon(Icons.arrow_drop_down);
+    var rowTextAndICon = Row({
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+        texto,
+        icon
+    ]});
+
+    console.log("DropdownButtonMultiple: ", valuesToReturn);
+   
+
+    //Column dropdown
+    var columnDropdown = Column({
+        children: items.map((dropDownMenuItem) => {
+            // var event = new CustomEvent("myOnChanged", {detail: dropDownMenuItem.value});
+            // dropDownMenuItem.child.element.classList.add("dropdownItem");
+            // dropDownMenuItem.child.element.addEventListener("click", (event:any) => {event.stopPropagation(); addOrValue(dropDownMenuItem.value)});
+            //Como dropdownMenuItem no es un elemento, sino solamente 
+            //un widget que me permitira obtener el valor a retornar en la funcion onChanged
+            //entonces debo retornar el elemento a crear
+            //en este caso el elemento a crear es el hijo del dropDownMenuItem, asi que lo retornamos
+            
+            //Creamos el visibility en una variable, para asi enviarla al callback 
+            //addOrRemoveValue asi podremos mostrar u ocultar el icono check
+            let visibility = Visibility({
+                child: Icon(Icons.done),
+                visible: false
+            });
+            dropDownMenuItem.child = Row({
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                    dropDownMenuItem.child,
+                    visibility
+                ]
+            });
+
+            dropDownMenuItem.child.element.classList.add("dropdownItem");
+            dropDownMenuItem.child.element.addEventListener("click", (event:any) => {event.stopPropagation(); addOrRemoveValue(dropDownMenuItem.value, visibility)});
+            return dropDownMenuItem.child;
+        }),
+        id: "Dropdown"
+    });
+    columnDropdown.element.style.cssText += `visibility: hidden; background: white; z-index: 99; position: absolute; top: 20px; box-shadow: 0px 1.5px 5px 4px #f1f1f1; max-height: 340px; overflow-y: scroll; scrollbar-width: 10px; min-width: 200px`;
+
+    //Row actions, listo o cancelar
+    var btnListo = FlatButton({child: Texto("Listo", new TextStyle({})), onPressed: (e:MouseEvent) => {e.stopPropagation(); beforeCallOnChangedCallBack()}});
+    var btnCancelar = FlatButton({child: Texto("Cancelar", new TextStyle({})), onPressed: (e:MouseEvent) => {e.stopPropagation(); beforeCallOnChangedCallBack()}});
+    var rowActions = Row({
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+            btnCancelar,
+            btnListo
+        ]
+    });
+    columnDropdown.child.push(rowActions);
+
+    function addOrRemoveValue(value:string, visibility:any){
+        if(valuesToReturn.length == 0){
+            visibility.element.style.display = "block";
+            addValue(value);
+        }
+        else if(valuesToReturn.indexOf(value) == -1){
+            visibility.element.style.display = "block";
+            addValue(value);
+        }
+        else{
+            visibility.element.style.display = "none";
+            removeValue(value);
+        }
+    }
+
+    function addValue(value:string){
+        valuesToReturn.push(value);
+    }
+
+    function removeValue(value:string){
+        let index:number = valuesToReturn.indexOf(value);
+        if(index != -1)
+            valuesToReturn.splice(index, 1);
+    }
+
+    function beforeCallOnChangedCallBack(){
+        columnDropdown.element.style.visibility = "hidden";
+        closeDropdown();
+        onChanged(valuesToReturn);
+        console.log("beforeCallOnChangedCallBack: ", valuesToReturn);
+        if(valuesToReturn.length == 0)
+            texto.element.innerHTML = "Seleccionar...";
+        else
+            texto.element.innerHTML = valuesToReturn;
+    }
+    
+    function closeDropdown(){
+        columnDropdown.element.style.visibility = "hidden";
+    }
+    
+    
+
+    
+
+   
+
+
+
+    
+    // container.appendChild(label);
+    // container.appendChild(input);
+    // container.appendChild(parrafo);
+    var containerDropDown = Column({
+        children: [
+            rowTextAndICon,
+            columnDropdown,
+        ],
+        id: "ContainerDropdownButtonMultiple"
+    });
+    containerDropDown.element.style.cssText = "border-bottom: 1px solid #c1c1c1;"
+
+    
+
+    //Cuado se haga click en otra parte que no sea el dropdown pues este se cerrara
+    window.addEventListener("click", function(){
+        if(columnDropdown.element.style.visibility == "visible"){
+            // console.log("dentro windows: ", culo.classList.contains("open"), " ", culo.style.visibility);
+            columnDropdown.element.style.visibility = "hidden";
+            beforeCallOnChangedCallBack();
+        }
+    })
+
+      containerDropDown.element.addEventListener("click", function(event){
+        event.stopPropagation();
+        console.log("Dentrtooooo");
+        if(columnDropdown.element.style.visibility == "visible")
+            return;
+        columnDropdown.element.style.visibility ="visible";
+        //animamos el dropdown
+        columnDropdown.element.animate([
+            // keyframes
+            // { transform: 'translateY(0px)' }, 
+            // { transform: 'translateY(50px)' }
+            { transform: 'scale(0)' }, 
+            { transform: 'scale(1)' }
+            ], 
+            { 
+                // timing options
+                duration: 100,
+                // iterations: Infinity
+            }
+        );
+        
+      })
+
+      
+
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    // element.style.flexGrow = `20`;
+
+    //La variable validator es una function que se invoca desde TextFormField y esta retorna null si es valido
+    // y retorna un String en caso contrario con un mensaje  indicando el error de validacion
+    
+
+    return containerDropDown;
+    // return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
+}
+
 
 
 interface namedParametersBuilder{
@@ -1246,6 +1425,30 @@ function RaisedButton({child, onPressed, color = "#1a73e8"} : namedParametersRai
     return container;
 }
 
+interface namedParametersFlatButton {
+    onPressed : any;
+    child : any;
+    color? : any;
+}
+
+function FlatButton({child, onPressed, color = "#1a73e8"} : namedParametersFlatButton){
+    // var element = document.createElement("div");
+    // element.setAttribute("id", ramdomString(5));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
+    
+    var container = Container({id: "FlatButton", child: child, style: new TextStyle({color: color, cursor: "pointer",padding: EdgetInsets.only({left: 14, right: 14, bottom: 7, top: 7}), borderRadius: BorderRadius.all(4)})});
+    if(onPressed)
+        container.element.addEventListener("click", onPressed);
+
+    container.element.classList.add("buttonFlatHover");
+
+    // container.element.style.background = "yellow";
+    // container.element.style.padding = "5px 10px 5px 10px";
+    // container.element.style.height = "10px";
+    return container;
+}
+
 interface namedParametersSizedBox {
     child? : any;
     width? : number;
@@ -1267,6 +1470,87 @@ function SizedBox({child, width, height} : namedParametersSizedBox){
         return {"element" : element, "child" : [child]};
     else
         return {"element" : element, "child" : []};
+}
+
+interface namedParametersCircularProgressIndicator{
+    color?:string;
+}
+
+function CircularProgressIndicator({color = '#3498db'} : namedParametersCircularProgressIndicator){
+    var element = document.createElement("div");
+    element.setAttribute("id", 'SizedBox-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    element.style.cssText = `border: 2px solid #f3f3f3; border-top: 2px solid ${color}; border-right: 2px solid ${color}; border-radius: 50%; width: 14px; height: 14px;`;
+    element.animate([
+        // keyframes
+        // { transform: 'translateY(0px)' }, 
+        // { transform: 'translateY(50px)' }
+        { transform: 'rotate(0deg)' }, 
+        { transform: 'rotate(360deg)' }
+        ], 
+        { 
+            // timing options
+            duration: 1400,
+            iterations: Infinity
+        }
+    );
+    if(color != null && color != undefined)
+        element.style.color = color;
+    // if(width)
+    //     element.style.width = `${width}${fontSizeUnit}`;
+    // if(height)
+    //     element.style.height = `${height}${fontSizeUnit}`;
+
+    // if(child != null && child != undefined)
+    //     return {"element" : element, "child" : [child]};
+    // else
+        return {"element" : element, "child" : []};
+}
+
+class Utils{
+    static headers:any = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
+}
+
+interface namedParametersGet{
+    url:string;
+    headers:any;
+}
+
+interface namedParametersPost{
+    url:string;
+    headers:any;
+    data:any;
+}
+
+class http{
+    static async get({url, headers}:namedParametersGet){
+        try {
+            var myRequest = new Request(url, headers);
+            let response:any = await fetch(myRequest);
+            let data:any = await response.json();
+            return data;
+        } catch (error) {
+            console.log("Error http get: ", error);
+            throw new Error(`error: ${error}`);
+        }
+        
+    }
+
+    static async post({url, headers, data}:namedParametersPost){
+        try {
+            var myRequest = new Request(url, headers);
+            let response:any = await fetch(url, {method: "POST", body: data, headers: headers});
+            let responseData:any = await response.json();
+            return responseData;
+        } catch (error) {
+            console.log("Error http get: ", error);
+            throw new Error(`error: ${error}`);
+        }
+        
+    }
 }
 
 function builderRecursivo(widget : any, isInit = false, widgetsYaCreados : any = null){
@@ -1768,6 +2052,7 @@ var _txt2 = new TextEditingController();
 var _actionColor = "blue";
 let items: string[] = ["Valor1", "Valor2", "Valor3", "Culo", "Ripio", "tallo", "la semilla"];
 var _index = 0; 
+let _cargando = false;
 
 Builder({
     id: "container",
@@ -1780,6 +2065,21 @@ Builder({
                 style: new TextStyle({}),
                 child: Row({
                     children: [
+                        RaisedButton({
+                            child: Row({
+                                children: [
+                                    Visibility({
+                                        visible: _cargando,
+                                        child: CircularProgressIndicator({})
+                                    }),
+                                    Texto("load", new TextStyle({}))
+                                ]
+                            }),
+                            onPressed: ()=> {
+                                _cargando = !_cargando;
+                                setState();
+                            }
+                        }),
                         DropdownButton({
                             value: items[_index] ,
                             items: items.map((item) => {
@@ -1794,10 +2094,28 @@ Builder({
                                 // console.log("onchange: " + data);
                             }
                         }),
+                        DropdownButtonMultiple({
+                            items: items.map((item) => {
+                                return new DropDownMenuItem({child: Texto(item, new TextStyle({padding: EdgetInsets.all(12), cursor: "pointer"})), value: item});
+                            }),
+                            onChanged: (data:any) => {
+                                // var index = items.indexOf(`${data}`);
+                                // if(index != -1){
+                                //     _index = index;
+                                //     setState();
+                                // }
+                                console.log("onchange: " + data);
+                            },
+                            selectedValues: [],
+                        }),
                         RaisedButton({
                             child: Texto(items[_index], new TextStyle({})),
                             onPressed: ()=>{
-
+                                
+                                var headers = new Headers();
+                                headers.append('Content-Type', 'application/json');
+                                headers.append('Accept', 'application/json');
+                                http.get({url: "https://pruebass.ml/api/routes", headers: headers});
                             }
                         })
                     ]

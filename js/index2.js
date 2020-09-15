@@ -1,5 +1,41 @@
 "use strict";
 /********************* VARIABLES  ************************************/
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var fontSizeUnit = "px";
 var heightUnit = "vh";
 var widthUnit = "vw";
@@ -157,6 +193,7 @@ var FormGlobalKey = /** @class */ (function () {
 /********************* STYLES  ************************************/
 function InitDefaultStyle() {
     var buttonHover = 'div.buttonHover:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); }';
+    buttonHover += 'div.buttonFlatHover:hover{ background-color: rgba(0,0,0,0.05); filter:brightness(0.9); }';
     // var flex = '.flex {display: -webkit-box;display: -moz-box;display: -webkit-flex;display: -ms-flexbox;display: flex;}'
     // var row = '.row {-webkit-box-direction: normal; -webkit-box-orient: horizontal;-moz-box-direction: normal;-moz-box-orient: horizontal;}'
     var labelFloating = 'label.labelFloating {color: #bdb9b9; position: absolute; transform-origin: top left; transform: translate(0, 14px) scale(1);transition: all .19s ease-in-out;}'
@@ -273,13 +310,14 @@ var TextAlign = /** @class */ (function () {
 var Icons = /** @class */ (function () {
     function Icons(index) {
         var _this = this;
-        this.values = ["arrow_drop_down", "right", "center", "justify"];
+        this.values = ["arrow_drop_down", "done", "center", "justify"];
         this.toString = function () {
             return _this.values[_this.index];
         };
         this.index = index - 1;
     }
     Icons.arrow_drop_down = new Icons(1);
+    Icons.done = new Icons(2);
     return Icons;
 }());
 var MainAxisAlignment = /** @class */ (function () {
@@ -553,7 +591,7 @@ function Visibility(_a) {
     var child = _a.child, visible = _a.visible;
     var element = document.createElement("div");
     element.setAttribute("id", "Visibility-" + ramdomString(7));
-    if (visible)
+    if (visible == false)
         element.style.display = "none";
     return { "element": element, "style": {}, "type": "Visibility", "child": [child] };
 }
@@ -768,6 +806,141 @@ function DropdownButton(_a) {
     return containerDropDown;
     // return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
 }
+function DropdownButtonMultiple(_a) {
+    var items = _a.items, onChanged = _a.onChanged, _b = _a.selectedValues, selectedValues = _b === void 0 ? [] : _b;
+    var values = (selectedValues.length > 0) ? selectedValues.toString() : "Seleccionar";
+    var valuesToReturn = (selectedValues != null && selectedValues != undefined) ? selectedValues : [];
+    //fila para mostrar texto e icono principal
+    var texto = Texto(values, new TextStyle({}));
+    var icon = Icon(Icons.arrow_drop_down);
+    var rowTextAndICon = Row({
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+            texto,
+            icon
+        ]
+    });
+    console.log("DropdownButtonMultiple: ", valuesToReturn);
+    //Column dropdown
+    var columnDropdown = Column({
+        children: items.map(function (dropDownMenuItem) {
+            // var event = new CustomEvent("myOnChanged", {detail: dropDownMenuItem.value});
+            // dropDownMenuItem.child.element.classList.add("dropdownItem");
+            // dropDownMenuItem.child.element.addEventListener("click", (event:any) => {event.stopPropagation(); addOrValue(dropDownMenuItem.value)});
+            //Como dropdownMenuItem no es un elemento, sino solamente 
+            //un widget que me permitira obtener el valor a retornar en la funcion onChanged
+            //entonces debo retornar el elemento a crear
+            //en este caso el elemento a crear es el hijo del dropDownMenuItem, asi que lo retornamos
+            //Creamos el visibility en una variable, para asi enviarla al callback 
+            //addOrRemoveValue asi podremos mostrar u ocultar el icono check
+            var visibility = Visibility({
+                child: Icon(Icons.done),
+                visible: false
+            });
+            dropDownMenuItem.child = Row({
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                    dropDownMenuItem.child,
+                    visibility
+                ]
+            });
+            dropDownMenuItem.child.element.classList.add("dropdownItem");
+            dropDownMenuItem.child.element.addEventListener("click", function (event) { event.stopPropagation(); addOrRemoveValue(dropDownMenuItem.value, visibility); });
+            return dropDownMenuItem.child;
+        }),
+        id: "Dropdown"
+    });
+    columnDropdown.element.style.cssText += "visibility: hidden; background: white; z-index: 99; position: absolute; top: 20px; box-shadow: 0px 1.5px 5px 4px #f1f1f1; max-height: 340px; overflow-y: scroll; scrollbar-width: 10px; min-width: 200px";
+    //Row actions, listo o cancelar
+    var btnListo = FlatButton({ child: Texto("Listo", new TextStyle({})), onPressed: function (e) { e.stopPropagation(); beforeCallOnChangedCallBack(); } });
+    var btnCancelar = FlatButton({ child: Texto("Cancelar", new TextStyle({})), onPressed: function (e) { e.stopPropagation(); beforeCallOnChangedCallBack(); } });
+    var rowActions = Row({
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+            btnCancelar,
+            btnListo
+        ]
+    });
+    columnDropdown.child.push(rowActions);
+    function addOrRemoveValue(value, visibility) {
+        if (valuesToReturn.length == 0) {
+            visibility.element.style.display = "block";
+            addValue(value);
+        }
+        else if (valuesToReturn.indexOf(value) == -1) {
+            visibility.element.style.display = "block";
+            addValue(value);
+        }
+        else {
+            visibility.element.style.display = "none";
+            removeValue(value);
+        }
+    }
+    function addValue(value) {
+        valuesToReturn.push(value);
+    }
+    function removeValue(value) {
+        var index = valuesToReturn.indexOf(value);
+        if (index != -1)
+            valuesToReturn.splice(index, 1);
+    }
+    function beforeCallOnChangedCallBack() {
+        columnDropdown.element.style.visibility = "hidden";
+        closeDropdown();
+        onChanged(valuesToReturn);
+        console.log("beforeCallOnChangedCallBack: ", valuesToReturn);
+        if (valuesToReturn.length == 0)
+            texto.element.innerHTML = "Seleccionar...";
+        else
+            texto.element.innerHTML = valuesToReturn;
+    }
+    function closeDropdown() {
+        columnDropdown.element.style.visibility = "hidden";
+    }
+    // container.appendChild(label);
+    // container.appendChild(input);
+    // container.appendChild(parrafo);
+    var containerDropDown = Column({
+        children: [
+            rowTextAndICon,
+            columnDropdown,
+        ],
+        id: "ContainerDropdownButtonMultiple"
+    });
+    containerDropDown.element.style.cssText = "border-bottom: 1px solid #c1c1c1;";
+    //Cuado se haga click en otra parte que no sea el dropdown pues este se cerrara
+    window.addEventListener("click", function () {
+        if (columnDropdown.element.style.visibility == "visible") {
+            // console.log("dentro windows: ", culo.classList.contains("open"), " ", culo.style.visibility);
+            columnDropdown.element.style.visibility = "hidden";
+            beforeCallOnChangedCallBack();
+        }
+    });
+    containerDropDown.element.addEventListener("click", function (event) {
+        event.stopPropagation();
+        console.log("Dentrtooooo");
+        if (columnDropdown.element.style.visibility == "visible")
+            return;
+        columnDropdown.element.style.visibility = "visible";
+        //animamos el dropdown
+        columnDropdown.element.animate([
+            // keyframes
+            // { transform: 'translateY(0px)' }, 
+            // { transform: 'translateY(50px)' }
+            { transform: 'scale(0)' },
+            { transform: 'scale(1)' }
+        ], {
+            // timing options
+            duration: 100,
+        });
+    });
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    // element.style.flexGrow = `20`;
+    //La variable validator es una function que se invoca desde TextFormField y esta retorna null si es valido
+    // y retorna un String en caso contrario con un mensaje  indicando el error de validacion
+    return containerDropDown;
+    // return {"element" : container, "style" : {}, "type" : "TextFormField", "child" : []};
+}
 function Builder(_a) {
     var id = _a.id, builder = _a.builder;
     var element = document.getElementById(id);
@@ -820,6 +993,21 @@ function RaisedButton(_a) {
     // container.element.style.height = "10px";
     return container;
 }
+function FlatButton(_a) {
+    // var element = document.createElement("div");
+    // element.setAttribute("id", ramdomString(5));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    // var css = 'table td:hover{ background-color: rgba(0,0,0,0.8); filter:brightness(0.9); } ';
+    var child = _a.child, onPressed = _a.onPressed, _b = _a.color, color = _b === void 0 ? "#1a73e8" : _b;
+    var container = Container({ id: "FlatButton", child: child, style: new TextStyle({ color: color, cursor: "pointer", padding: EdgetInsets.only({ left: 14, right: 14, bottom: 7, top: 7 }), borderRadius: BorderRadius.all(4) }) });
+    if (onPressed)
+        container.element.addEventListener("click", onPressed);
+    container.element.classList.add("buttonFlatHover");
+    // container.element.style.background = "yellow";
+    // container.element.style.padding = "5px 10px 5px 10px";
+    // container.element.style.height = "10px";
+    return container;
+}
 function SizedBox(_a) {
     var child = _a.child, width = _a.width, height = _a.height;
     var element = document.createElement("div");
@@ -834,6 +1022,98 @@ function SizedBox(_a) {
     else
         return { "element": element, "child": [] };
 }
+function CircularProgressIndicator(_a) {
+    var _b = _a.color, color = _b === void 0 ? '#3498db' : _b;
+    var element = document.createElement("div");
+    element.setAttribute("id", 'SizedBox-' + ramdomString(7));
+    // var defaultStyle = {"display" : "flex", "flex-direction" : "row"};
+    element.style.cssText = "border: 2px solid #f3f3f3; border-top: 2px solid " + color + "; border-right: 2px solid " + color + "; border-radius: 50%; width: 14px; height: 14px;";
+    element.animate([
+        // keyframes
+        // { transform: 'translateY(0px)' }, 
+        // { transform: 'translateY(50px)' }
+        { transform: 'rotate(0deg)' },
+        { transform: 'rotate(360deg)' }
+    ], {
+        // timing options
+        duration: 1400,
+        iterations: Infinity
+    });
+    if (color != null && color != undefined)
+        element.style.color = color;
+    // if(width)
+    //     element.style.width = `${width}${fontSizeUnit}`;
+    // if(height)
+    //     element.style.height = `${height}${fontSizeUnit}`;
+    // if(child != null && child != undefined)
+    //     return {"element" : element, "child" : [child]};
+    // else
+    return { "element": element, "child": [] };
+}
+var Utils = /** @class */ (function () {
+    function Utils() {
+    }
+    Utils.headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    };
+    return Utils;
+}());
+var http = /** @class */ (function () {
+    function http() {
+    }
+    http.get = function (_a) {
+        var url = _a.url, headers = _a.headers;
+        return __awaiter(this, void 0, void 0, function () {
+            var myRequest, response, data, error_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 3, , 4]);
+                        myRequest = new Request(url, headers);
+                        return [4 /*yield*/, fetch(myRequest)];
+                    case 1:
+                        response = _b.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        data = _b.sent();
+                        return [2 /*return*/, data];
+                    case 3:
+                        error_1 = _b.sent();
+                        console.log("Error http get: ", error_1);
+                        throw new Error("error: " + error_1);
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    http.post = function (_a) {
+        var url = _a.url, headers = _a.headers, data = _a.data;
+        return __awaiter(this, void 0, void 0, function () {
+            var myRequest, response, responseData, error_2;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 3, , 4]);
+                        myRequest = new Request(url, headers);
+                        return [4 /*yield*/, fetch(url, { method: "POST", body: data, headers: headers })];
+                    case 1:
+                        response = _b.sent();
+                        return [4 /*yield*/, response.json()];
+                    case 2:
+                        responseData = _b.sent();
+                        return [2 /*return*/, responseData];
+                    case 3:
+                        error_2 = _b.sent();
+                        console.log("Error http get: ", error_2);
+                        throw new Error("error: " + error_2);
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return http;
+}());
 function builderRecursivo(widget, isInit, widgetsYaCreados) {
     var _a;
     if (isInit === void 0) { isInit = false; }
@@ -1204,6 +1484,7 @@ var _txt2 = new TextEditingController();
 var _actionColor = "blue";
 var items = ["Valor1", "Valor2", "Valor3", "Culo", "Ripio", "tallo", "la semilla"];
 var _index = 0;
+var _cargando = false;
 Builder({
     id: "container",
     builder: function (id, setState) {
@@ -1215,6 +1496,21 @@ Builder({
                 style: new TextStyle({}),
                 child: Row({
                     children: [
+                        RaisedButton({
+                            child: Row({
+                                children: [
+                                    Visibility({
+                                        visible: _cargando,
+                                        child: CircularProgressIndicator({})
+                                    }),
+                                    Texto("load", new TextStyle({}))
+                                ]
+                            }),
+                            onPressed: function () {
+                                _cargando = !_cargando;
+                                setState();
+                            }
+                        }),
                         DropdownButton({
                             value: items[_index],
                             items: items.map(function (item) {
@@ -1229,9 +1525,27 @@ Builder({
                                 // console.log("onchange: " + data);
                             }
                         }),
+                        DropdownButtonMultiple({
+                            items: items.map(function (item) {
+                                return new DropDownMenuItem({ child: Texto(item, new TextStyle({ padding: EdgetInsets.all(12), cursor: "pointer" })), value: item });
+                            }),
+                            onChanged: function (data) {
+                                // var index = items.indexOf(`${data}`);
+                                // if(index != -1){
+                                //     _index = index;
+                                //     setState();
+                                // }
+                                console.log("onchange: " + data);
+                            },
+                            selectedValues: [],
+                        }),
                         RaisedButton({
                             child: Texto(items[_index], new TextStyle({})),
                             onPressed: function () {
+                                var headers = new Headers();
+                                headers.append('Content-Type', 'application/json');
+                                headers.append('Accept', 'application/json');
+                                http.get({ url: "https://pruebass.ml/api/routes", headers: headers });
                             }
                         })
                     ]
