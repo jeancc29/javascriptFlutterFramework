@@ -820,7 +820,6 @@ function DropdownButtonMultiple(_a) {
             icon
         ]
     });
-    console.log("DropdownButtonMultiple: ", valuesToReturn);
     //Column dropdown
     var columnDropdown = Column({
         children: items.map(function (dropDownMenuItem) {

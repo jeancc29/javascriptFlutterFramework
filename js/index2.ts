@@ -1188,7 +1188,6 @@ function DropdownButtonMultiple({items, onChanged, selectedValues = []} : namedP
         icon
     ]});
 
-    console.log("DropdownButtonMultiple: ", valuesToReturn);
    
 
     //Column dropdown
